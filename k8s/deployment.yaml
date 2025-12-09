@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+      - name: django-container
+        image: django-k8s-app:v2
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: LD_SDK_KEY        # Nombre de la variable
+          valueFrom:              
+            secretKeyRef:
+              name: launchdarkly-secret  
+              key: LD_SDK_KEY         
