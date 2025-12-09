@@ -42,11 +42,15 @@ def get_tasks(request):
 
     # Consultar la flag pasando el objeto 'context'
     show_feature = ldclient.get().variation("show-tasks", context, False)
+    
+    # Log de depuración
+    print(f"[DEBUG] LaunchDarkly flag 'show-tasks' value: {show_feature}")
+    print(f"[DEBUG] SDK_KEY configured: {SDK_KEY[:10]}..." if SDK_KEY else "[DEBUG] No SDK_KEY")
 
     if show_feature:
         return JsonResponse(TASKS_DATA, safe=False)
     else:
         return JsonResponse(
-            {"mensaje": "El servicio de tareas está deshabilitado temporalmente por mantenimiento (LaunchDarkly)."}, 
+            {"mensaje": "El servicio de tareas está deshabilitado temporalmente por mantenimiento (LaunchDarkly).", "flag_value": show_feature}, 
             status=503
         )
