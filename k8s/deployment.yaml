@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: django-container
-          image: markenx/markenx-django:1.0
+          image: markenx/markenx-django:1.1
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
