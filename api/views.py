@@ -1,28 +1,52 @@
+import os
+import ldclient
+from ldclient.config import Config
+from ldclient import Context
 from django.http import JsonResponse
 
-# --- DATOS (Simulando una Base de Datos) ---
+# --- CONFIGURACIÓN LAUNCHDARKLY ---
+SDK_KEY = os.environ.get('LD_SDK_KEY')
 
-# Estudiantes: id, nombre, apellido
+if SDK_KEY:
+    ldclient.set_config(Config(SDK_KEY))
+else:
+    print("ADVERTENCIA: LD_SDK_KEY no configurada.")
+
+# --- DATOS ---
 STUDENTS_DATA = [
     {"id": 1, "nombre": "Juan", "apellido": "Pérez"},
     {"id": 2, "nombre": "Ana", "apellido": "Gómez"},
     {"id": 3, "nombre": "Carlos", "apellido": "López"},
 ]
 
-# Tareas: id, nombre, descripción
 TASKS_DATA = [
     {"id": 101, "nombre": "Investigación DevOps", "descripcion": "Investigar sobre ArgoCD y Kubernetes"},
     {"id": 102, "nombre": "Desarrollo API", "descripcion": "Crear endpoints en Django"},
     {"id": 103, "nombre": "Pruebas", "descripcion": "Verificar feature flags con LaunchDarkly"},
 ]
 
-# --- VISTAS (ENDPOINTS) ---
+# --- VISTAS ---
 
 def get_students(request):
-    """Retorna la lista de todos los estudiantes"""
     return JsonResponse(STUDENTS_DATA, safe=False)
 
 def get_tasks(request):
-    """Retorna la lista de todas las tareas"""
-    # Más adelante aquí agregaremos la lógica de LaunchDarkly
-    return JsonResponse(TASKS_DATA, safe=False)
+    """
+    Endpoint protegido por LaunchDarkly (vía Context).
+    """
+    if not SDK_KEY:
+        return JsonResponse({"error": "LaunchDarkly no configurado"}, status=503)
+
+    # Constructor Context.builder()
+    context = Context.builder('user-anonimo').name('Anonimo').build()
+
+    # Consultar la flag pasando el objeto 'context'
+    show_feature = ldclient.get().variation("show-tasks", context, False)
+
+    if show_feature:
+        return JsonResponse(TASKS_DATA, safe=False)
+    else:
+        return JsonResponse(
+            {"mensaje": "El servicio de tareas está deshabilitado temporalmente por mantenimiento (LaunchDarkly)."}, 
+            status=503
+        )
