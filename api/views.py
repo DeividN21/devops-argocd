@@ -41,10 +41,10 @@ def get_tasks(request):
     context = Context.builder('user-anonimo').name('Anonimo').build()
 
     # Consultar la flag pasando el objeto 'context'
-    show_feature = ldclient.get().variation("show-tasks", context, False)
+    show_feature = ldclient.get().variation("endpoint-feature", context, False)
     
     # Log de depuración
-    print(f"[DEBUG] LaunchDarkly flag 'show-tasks' value: {show_feature}")
+    print(f"[DEBUG] LaunchDarkly flag 'endpoint-feature' value: {show_feature}")
     print(f"[DEBUG] SDK_KEY configured: {SDK_KEY[:10]}..." if SDK_KEY else "[DEBUG] No SDK_KEY")
 
     if show_feature:
