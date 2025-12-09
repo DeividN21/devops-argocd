@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-app-deployment
+  name: markenx-deployment
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: django-app
+      app: markenx-app
   template:
     metadata:
       labels:
-        app: django-app
+        app: markenx-app
     spec:
       containers:
-      - name: django-container
-        image: django-k8s-app:v2
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 8000
-        env:
-        - name: LD_SDK_KEY        # Nombre de la variable
-          valueFrom:              
-            secretKeyRef:
-              name: launchdarkly-secret  
-              key: LD_SDK_KEY         
+        - name: django-container
+          image: markenx/markenx-django:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: LD_SDK_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: launchdarkly-secret
+                  key: LD_SDK_KEY

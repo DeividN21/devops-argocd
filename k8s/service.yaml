@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: django-app-service
+  name: markenx-service
 spec:
   type: NodePort # Expone el servicio en un puerto accesible de la IP de Minikube
   selector:
-    app: django-app
+    app: markenx-app
   ports:
     - protocol: TCP
       port: 8000       # El puerto del servicio
